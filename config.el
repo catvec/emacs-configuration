@@ -32,7 +32,7 @@
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-(setq doom-theme 'doom-acario-dark)
+(setq doom-theme 'doom-snazzy)
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
@@ -75,11 +75,18 @@
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
 
+                                        ; Packages
+(use-package salt-mode
+  :ensure t)
+
 								; Editor
 ;; Word Wrap
 ;; Website: https://docs.doomemacs.org/v21.12/modules/editor/word-wrap/
 ;; enable word-wrap (almost) everywhere
 (+global-word-wrap-mode +1)
+
+;; Language modes
+;;(add-to-list 'auto-mode-alist '("\\.sls\\'" . yaml-mode))
 
                                         ; Term
 ;; Switch To / Open Terminal
@@ -89,7 +96,7 @@
   "Returns name of doom vterm buffer for project."
   (concat "*doom:vterm-popup:" (projectile-project-name) "*"))
 
-(defun upsert-projectile-vterm-buffer ()
+(defun open-projectile-vterm-buffer ()
   "Ensure a vterm buffer for the project is open and focused.
 
 If no vterm exists one will be created.
@@ -97,12 +104,12 @@ If vterm buffer is closed it will be opened.
 Vterm buffer will be focused."
   (interactive)
     (let ((vterm-buf (get-buffer (projectile-project-vterm-buffer-name))))
-      (if vterm-buf ;; IF VTerm buffer exists
-           (if (not (eq (current-buffer) vterm-buf)) ;; IF VTerm buffer not current buffer
-               (if (get-buffer-window vterm-buf) ;; IF VTerm buffer is visible
-                   (switch-to-buffer-other-frame vterm-buf) ;; THEN Switch to buffer
-                 (pop-to-buffer vterm-buf))) ;; ELSE pop out vterm buffer
-        (+vterm/toggle 't)))) ;; ELSE create new vterm buffer
+      (if vterm-buf ;; VTerm buffer exists
+           (if (not (eq (current-buffer) vterm-buf)) ;; VTerm buffer not current buffer
+               (if (get-buffer-window vterm-buf) ;; VTerm buffer is visible
+                   (switch-to-buffer-other-frame vterm-buf)
+                 (pop-to-buffer vterm-buf)))
+        (+vterm/toggle 't))))
 
 (map! :prefix ("C-c b" . "switch buffers")
-      :desc "Upsert VTerm" "t" #'upsert-projectile-vterm-buffer)
+      :desc "Open vterm" "t" #'open-projectile-vterm-buffer)
