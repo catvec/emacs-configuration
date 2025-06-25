@@ -92,7 +92,7 @@
 (require 'named-vterm)
 
 (map! :prefix ("C-c b" . "switch buffers")
-      :desc "Open vterm" "T" #'named-vterm/toggle-buffer)
+      :desc "Open vterm" "T" #'named-vterm/open)
 (map! :prefix ("C-c b" . "switch buffers")
       :desc "Cycle vterm" "t" #'named-vterm/cycle-next-buffer)
 (map! :prefix ("C-c b" . "switch buffers")

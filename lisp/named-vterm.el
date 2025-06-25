@@ -87,9 +87,7 @@ BUFFERS is the list of buffers to filter, if not provided `vterm-buffer-list''s 
    (vterm-buffer-list buffers)))
 
 (defun named-vterm-get-buffer-user-provided-name-list-for-context (ctx)
-  "For a CTX list all user provided names for vterm buffers.
-
-CTX is either the project name or current directory if not in a project (See `named-vterm-format-buffer-id-context')."
+  "For a CTX list all user provided names for vterm buffers."
   (mapcar (lambda (buf) (plist-get (named-vterm-get-buffer-metadata-plist buf) :name)) (named-vterm-get-buffer-list-for-context ctx)))
 
 (defun named-vterm-open-or-create (name)
@@ -97,7 +95,8 @@ CTX is either the project name or current directory if not in a project (See `na
 
 Sets buffer metadata as described by `named-vterm-set-buffer-metadata'"
   (let* ((id (named-vterm-format-buffer-id name))
-         (buffer (or (named-vterm-get-buffer-by-id id)
+         (existing-buff (named-vterm-get-buffer-by-id id))
+         (buffer (or existing-buff
                      (let ((new-buffer (get-buffer-create id)))
                        (with-current-buffer new-buffer
                          (unless (eq major-mode 'vterm-mode)
@@ -106,7 +105,13 @@ Sets buffer metadata as described by `named-vterm-set-buffer-metadata'"
                           `(:context ,(named-vterm-format-buffer-id-context)
                             :name ,name
                             :id ,id)))
-                       new-buffer))))
+                       new-buffer)))
+         (buff-name (or
+                     (plist-get (named-vterm-get-buffer-metadata-plist buffer) :name)
+                     "main")))
+    (if existing-buff
+        (message (format "Switching to terminal %s" buff-name))
+      (message (format "Creating terminal %s" buff-name)))
     (pop-to-buffer buffer)))
 
 (defun named-vterm-visible-buffer-list-for-context (ctx)
@@ -127,38 +132,31 @@ If vterm buffer is not focused it will be focused."
     (if vterm-buf
         (pop-to-buffer vterm-buf))))
 
-(defun named-vterm/toggle-buffer (prefix)
-  "Toggle a vterm buffer for the project.
-If no vterm exists one will be created.
-If vterm buffer is closed it will be opened and focused.
-If a prefix argument is given a vterm buffer name will be prompted."
+(defun named-vterm/open (prefix)
+  "Open and focus a vterm buffer.
+
+If a prefix argument is given a vterm buffer name for the vterm to open will be prompted."
   (interactive "P")
   (let ((term-name (if prefix
                        (completing-read
                         "Terminal name: "
                         (named-vterm-get-buffer-user-provided-name-list-for-context (named-vterm-format-buffer-id-context))
                         (lambda (name) name)))))
-    (or (progn
-          (message (format "Switched to vterm buffer %s" (or term-name "main")))
-          (named-vterm-switch-to-id (named-vterm-format-buffer-id term-name)))
-        (progn
-          (message (format "Created new vterm buffer %s" (or term-name "main")))
-          (named-vterm-open-or-create term-name))))) ;; Create new vterm buffer
+    (named-vterm-open-or-create term-name)))
 
-(defun named-vterm/cycle-next-buffer (prefix)
-  "Cycle to the next vterm buffer for the project or create one if none.
-Calls `named-vterm-toggle-buffer' if no vterm buffers. See docs for behavior and prefix behavior."
-  (interactive "P")
+(defun named-vterm/cycle-next-buffer ()
+  "Cycle to the next vterm buffer for the project or create one if none."
+  (interactive)
   (let* ((first-visible-vterm-buff (car (named-vterm-visible-buffer-list-for-context (named-vterm-format-buffer-id-context))))
-         (vterm-buffs (named-vterm-get-buffer-list-for-context (named-vterm-format-buffer-id-context)))
+         (vterm-buffs (sort (named-vterm-get-buffer-list-for-context (named-vterm-format-buffer-id-context))))
          (next-vterm-buff (or
                            (car (cdr (member first-visible-vterm-buff vterm-buffs))) ;; Get next vterm buffer
-                           (car vterm-buffs)))) ;; If first-visible-vterm-buff was last item then wrap around and
+                           (car vterm-buffs)))) ;; If first-visible-vterm-buff was last item then wrap around and get first
     (if next-vterm-buff
-        (progn
-          (message (format "Switched to vterm buffer %s" (or (plist-get (named-vterm-get-buffer-metadata-plist next-vterm-buff) :name) "main")))
-          (named-vterm-switch-to-id (plist-get (named-vterm-get-buffer-metadata-plist next-vterm-buff) :id)))
-      (named-vterm/toggle-buffer prefix))))
+        (if (not (eq (current-buffer) next-vterm-buff))
+            (named-vterm-open-or-create (plist-get (named-vterm-get-buffer-metadata-plist next-vterm-buff) :name))
+          (message "Only one terminal"))
+      (named-vterm/open nil))))
 
 (defun named-vterm/switch-to-name (name)
   "Switch to a vterm buffer by selecting a name.
@@ -172,4 +170,4 @@ NAME can either be a named vterm or nil to indicate the main terminal."
       (if (string-equal input "main")
           nil
         input))))
-  (named-vterm-switch-to-id (named-vterm-format-buffer-id name)))
+  (named-vterm-open-or-create name))
