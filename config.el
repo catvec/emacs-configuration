@@ -89,27 +89,11 @@
 ;;(add-to-list 'auto-mode-alist '("\\.sls\\'" . yaml-mode))
 
                                         ; Term
-;; Switch To / Open Terminal
-;; The +vterm/here +vterm/toggle commands fail to "upsert" a terminal buffer
-;; Ie., Switch to the terminal buffer if it exists, and if it doesn't create one and switch
-(defun projectile-project-vterm-buffer-name ()
-  "Returns name of doom vterm buffer for project."
-  (concat "*doom:vterm-popup:" (projectile-project-name) "*"))
-
-(defun open-projectile-vterm-buffer ()
-  "Ensure a vterm buffer for the project is open and focused.
-
-If no vterm exists one will be created.
-If vterm buffer is closed it will be opened.
-Vterm buffer will be focused."
-  (interactive)
-    (let ((vterm-buf (get-buffer (projectile-project-vterm-buffer-name))))
-      (if vterm-buf ;; VTerm buffer exists
-           (if (not (eq (current-buffer) vterm-buf)) ;; VTerm buffer not current buffer
-               (if (get-buffer-window vterm-buf) ;; VTerm buffer is visible
-                   (switch-to-buffer-other-frame vterm-buf)
-                 (pop-to-buffer vterm-buf)))
-        (+vterm/toggle 't))))
+(require 'named-vterm)
 
 (map! :prefix ("C-c b" . "switch buffers")
-      :desc "Open vterm" "t" #'open-projectile-vterm-buffer)
+      :desc "Open vterm" "T" #'named-vterm/toggle-buffer)
+(map! :prefix ("C-c b" . "switch buffers")
+      :desc "Cycle vterm" "t" #'named-vterm/cycle-next-buffer)
+(map! :prefix ("C-c b" . "switch buffers")
+      :desc "Switch to vterm" "n" #'named-vterm/switch-to-name)
