@@ -76,10 +76,6 @@
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
 
-                                        ; Packages
-(use-package salt-mode
-  :ensure t)
-
 								; Editor
 ;; Word Wrap
 ;; Website: https://docs.doomemacs.org/v21.12/modules/editor/word-wrap/
