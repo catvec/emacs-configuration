@@ -89,7 +89,7 @@
 ;;(add-to-list 'auto-mode-alist '("\\.sls\\'" . yaml-mode))
 
                                         ; Term
-(require 'named-vterm)
+(load! "snippets/named-vterm.el")
 
 (map! :prefix ("C-c b" . "switch buffers")
       :desc "Open vterm" "T" #'named-vterm/open)
