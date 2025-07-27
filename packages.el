@@ -51,5 +51,9 @@
 
 ;; Org Mode HTTP Client
 (package! ob-http)
+
+;; AI assistant
+(package! copilot
+  :recipe (:host github :repo "copilot-emacs/copilot.el" :files ("*.el")))
 ;; .sls files
 (package! salt-mode)
