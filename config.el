@@ -94,3 +94,16 @@
       :desc "Cycle vterm" "t" #'named-vterm/cycle-next-buffer)
 (map! :prefix ("C-c b" . "switch buffers")
       :desc "Switch to vterm" "n" #'named-vterm/switch-to-name)
+
+                                        ; Editor
+;; LSP
+;; (use-package! lsp-ui
+;;   :config
+;;   (setq lsp-ui-sideline-show-code-actions 't)
+;;   ;; (setq lsp-ui-doc-show-with-mouse 't)
+;;   ;; (setq lsp-ui-doc-show-with-cursor 't)
+;;   (map! :prefix "C-c b"
+;;         :desc "Focus docs popup" "h" #'lsp-ui-doc-focus-frame))
+(use-package! lsp-bridge
+  :config
+  (global-lsp-bridge-mode))
