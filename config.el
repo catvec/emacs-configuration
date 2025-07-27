@@ -107,3 +107,9 @@
 (use-package! lsp-bridge
   :config
   (global-lsp-bridge-mode))
+
+(use-package! ob-http
+  :config (org-babel-do-load-languages
+           'org-babel-load-languages
+           '((emacs-lisp . t)
+             (http . t))))

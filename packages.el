@@ -48,5 +48,8 @@
 ;; (unpin! pinned-package another-pinned-package)
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;; (unpin! t)
+
+;; Org Mode HTTP Client
+(package! ob-http)
 ;; .sls files
 (package! salt-mode)
