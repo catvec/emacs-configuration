@@ -94,6 +94,8 @@
       :desc "Cycle vterm" "t" #'named-vterm/cycle-next-buffer)
 (map! :prefix ("C-c b" . "switch buffers")
       :desc "Switch to vterm" "n" #'named-vterm/switch-to-name)
+(map! :prefix ("C-c b" . "switch buffers")
+      :desc "Set vterm position" "p" #'named-vterm/set-position)
 
                                         ; Editor
 ;; LSP
