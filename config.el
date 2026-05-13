@@ -126,9 +126,10 @@
 ;;               ("TAB" . 'copilot-accept-completion)
 ;;               ("C-TAB" . 'copilot-accept-completion-by-word)
 ;;               ("C-<tab>" . 'copilot-accept-completion-by-word)))
-
-
-(require 'zoom-frm)
+;; Zoom in and out
+(load! "snippets/frame-fns.el")
+(load! "snippets/frame-cmds.el")
+(load! "snippets/zoom-frm.el")
 (map! :leader
       :desc "Zoom in all frames"  "+" #'zoom-all-frames-in
       :desc "Zoom out all frames" "-" #'zoom-all-frames-out)
