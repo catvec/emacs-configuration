@@ -96,6 +96,8 @@
       :desc "Switch to vterm" "n" #'named-vterm/switch-to-name)
 (map! :prefix ("C-c b" . "switch buffers")
       :desc "Set vterm position" "p" #'named-vterm/set-position)
+(map! :prefix ("C-c b" . "switch buffers")
+      :desc "Rename vterm" "r" #'named-vterm/rename)
 
                                         ; Editor
 ;; LSP
