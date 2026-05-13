@@ -162,3 +162,5 @@
 (map! :leader
       :desc "Zoom in all frames"  "+" #'zoom-all-frames-in
       :desc "Zoom out all frames" "-" #'zoom-all-frames-out)
+
+(use-package! prisma-mode)

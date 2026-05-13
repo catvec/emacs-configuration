@@ -69,3 +69,9 @@
                  :build (:not compile)))
   (package! markdown-mode)
   (package! yasnippet))
+
+(package! prisma-mode
+  :recipe (:host github
+           :repo "davidarenas/prisma-mode"
+           :branch "master"
+           :files ("*.el")))
