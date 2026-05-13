@@ -35,6 +35,10 @@
 ;; doom-snazzy
 (setq doom-theme 'doom-challenger-deep)
 
+;; Make possible to add files to existing emacs from command line
+(require 'server)
+(unless (server-running-p) (server-start))
+
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
 (setq display-line-numbers-type t)
