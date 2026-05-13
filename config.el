@@ -105,16 +105,49 @@
 
                                         ; Editor
 ;; LSP
-;; (use-package! lsp-ui
-;;   :config
-;;   (setq lsp-ui-sideline-show-code-actions 't)
-;;   ;; (setq lsp-ui-doc-show-with-mouse 't)
-;;   ;; (setq lsp-ui-doc-show-with-cursor 't)
-;;   (map! :prefix "C-c b"
-;;         :desc "Focus docs popup" "h" #'lsp-ui-doc-focus-frame))
+(defun lsp-bridge-setup-python-lsp-bridge-symlink ()
+  "Create a symlink to the lsp-bridge's python-lsp-bridge helper so it can have the required Python dependencies"
+  (let* ((lsp-bridge-el-file (locate-library "lsp-bridge"))
+         (lsp-bridge-dir (file-name-directory lsp-bridge-el-file))
+         (src-file (file-name-concat lsp-bridge-dir "python-lsp-bridge"))
+         (dst-file (file-name-concat (expand-file-name "~/.local/bin") "python-lsp-bridge"))
+         (existing-symlink-target (file-symlink-p dst-file)))
+
+    (if (file-exists-p src-file)
+        (progn
+
+          ;; Remove symlink if lsp-bridge package changed location
+          (if (and existing-symlink-target (not (string-equal src-file existing-symlink-target)))
+              (progn (delete-file dst-file)
+                     (message "Removed symlink '%s', pointed towards old file ('%s')" dst-file existing-symlink-target)))
+
+          ;; Create symlink if it doesn't exist
+          (if (not existing-symlink-target)
+              (progn (make-symbolic-link src-file dst-file)
+                     (message "Created symlink for python-lsp-bridge file '%s' => '%s'" dst-file src-file)))
+
+          ;; Ensure python-lsp-bridge source file has execute permissions
+          (if (not (file-executable-p src-file))
+              (progn (set-file-modes src-file (logior (file-modes src-file) #o111))
+                     (message "Set executable permissions on python-lsp-bridge source file '%s'" src-file)))
+          )
+      (message "Could not find the python-lsp-bridge helper script in the package directory at '%s'" src-file))
+    ))
+
 (use-package! lsp-bridge
+  :init
+  (lsp-bridge-setup-python-lsp-bridge-symlink)
   :config
-  (global-lsp-bridge-mode))
+  (global-lsp-bridge-mode)
+  (setq lsp-bridge-csharp-lsp-server "csharp-ls")
+  
+  ;; Register lsp-bridge as the primary lookup handler for all modes
+  ;; This creates a priority chain where lsp-bridge is tried first,
+  ;; then falls back to xref, dumb-jump, ripgrep, etc.
+  (set-lookup-handlers! '*' t
+   :definition #'lsp-bridge-find-def
+   :references #'lsp-bridge-find-references
+   :documentation #'lsp-bridge-popup-documentation))
 
 (use-package! ob-http
   :config (org-babel-do-load-languages
