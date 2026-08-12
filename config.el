@@ -103,6 +103,25 @@
 (map! :prefix ("C-c b" . "switch buffers")
       :desc "Rename vterm" "r" #'named-vterm/rename)
 
+;; Send Shift+Enter (CSI u: ESC[13;2u) through to the vterm process so TUIs
+;; like Claude Code and pi see a real shift+enter (newline instead of submit).
+(after! vterm
+  (defun my/vterm-send-modified-enter (mod)
+    "Send a modified Enter to the vterm process as CSI u.
+MOD is the kitty modifier code: 2 = shift, 3 = alt, 5 = ctrl."
+    (interactive)
+    (when (and vterm--term (process-live-p vterm--process)
+               (not (bound-and-true-p vterm-copy-mode)))
+      (process-send-string vterm--process (format "\e[13;%du" mod))))
+
+  (define-key vterm-mode-map (kbd "S-<return>")
+    (lambda () (interactive) (my/vterm-send-modified-enter 2))))
+  ;; Optional extras:
+  ;; (define-key vterm-mode-map (kbd "M-<return>")
+  ;;   (lambda () (interactive) (my/vterm-send-modified-enter 3)))
+  ;; (define-key vterm-mode-map (kbd "C-<return>")
+  ;;   (lambda () (interactive) (my/vterm-send-modified-enter 5))))
+
                                         ; Editor
 ;; LSP
 (defun lsp-bridge-setup-python-lsp-bridge-symlink ()
@@ -139,7 +158,8 @@
   (lsp-bridge-setup-python-lsp-bridge-symlink)
   :config
   (global-lsp-bridge-mode)
-  (setq lsp-bridge-csharp-lsp-server "csharp-ls")
+  (setq lsp-bridge-csharp-lsp-server "csharp-ls"
+        lsp-bridge-enable-search-words nil)
   
   ;; Register lsp-bridge as the primary lookup handler for all modes
   ;; This creates a priority chain where lsp-bridge is tried first,
