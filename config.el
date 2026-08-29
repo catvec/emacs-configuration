@@ -122,6 +122,12 @@ MOD is the kitty modifier code: 2 = shift, 3 = alt, 5 = ctrl."
   ;; (define-key vterm-mode-map (kbd "C-<return>")
   ;;   (lambda () (interactive) (my/vterm-send-modified-enter 5))))
 
+
+;; Page up / down keys
+(map! :map vterm-mode-map
+      :desc "Send page down" "M-n" #'vterm-send-next)
+(map! :map vterm-mode-map
+      :desc "Send page up" "M-p" #'vterm-send-prior)
                                         ; Editor
 ;; LSP
 (defun lsp-bridge-setup-python-lsp-bridge-symlink ()
@@ -160,7 +166,7 @@ MOD is the kitty modifier code: 2 = shift, 3 = alt, 5 = ctrl."
   (global-lsp-bridge-mode)
   (setq lsp-bridge-csharp-lsp-server "csharp-ls"
         lsp-bridge-enable-search-words nil)
-  
+
   ;; Register lsp-bridge as the primary lookup handler for all modes
   ;; This creates a priority chain where lsp-bridge is tried first,
   ;; then falls back to xref, dumb-jump, ripgrep, etc.
